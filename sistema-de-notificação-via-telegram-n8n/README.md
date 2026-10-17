@@ -4,7 +4,9 @@ Fluxo de automação desenvolvido no **n8n** para agendar, publicar e rastrear e
 
 ---
 
-## ⚙️ Visão Geral do Fluxo
+## 🗺️ Arquitetura do Fluxo
+
+<img width="1366" height="600" alt="Captura de tela 2026-10-17 110627" src="https://github.com/user-attachments/assets/7fcba300-9d0b-4306-b5a3-a3fe5fdca0d0" />
 
 1. **Schedule Trigger**: Executa de segunda a sexta-feira, às 09:00.
 2. **Google Sheets (Leitura)**: Busca os registros que estão com o status `Não Enviado`.
