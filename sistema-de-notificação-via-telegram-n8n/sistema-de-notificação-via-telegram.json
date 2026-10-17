@@ -1,0 +1,353 @@
+{
+  "name": "Sistema de notificação via Telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -272,
+        -128
+      ],
+      "id": "8fea3a54-c1ef-420f-8cce-9f1a23bfa50e",
+      "name": "Seg à Sex as 9:00hrs"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "SEU_DOCUMENT_ID_AQUI",
+          "mode": "list",
+          "cachedResultName": "Artigos Autotic",
+          "cachedResultUrl": "SEU_DOCUMENT_ID_AQUI"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "SEU_DOCUMENT_ID_AQUI"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "STATUS",
+              "lookupValue": "Não Enviado"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -48,
+        -128
+      ],
+      "id": "c6fc94b2-2e7d-44c7-8f32-4391b9e0ed72",
+      "name": "Obtém artigos Não Enviados",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SUA_CREDENCIAL_AQUI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        176,
+        -192
+      ],
+      "id": "5a98db84-4ea4-4a39-845d-ed5ecb4fbce1",
+      "name": "Limita em 1 Artigo"
+    },
+    {
+      "parameters": {
+        "chatId": "@seu_canal",
+        "text": "=**{{ $json.TITULO }}** \n\n_{{ $json['DESCRIÇÃO'] }}_\n\n{{ $json.URL }} \n",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        400,
+        -192
+      ],
+      "id": "0e477c4e-e545-4239-9c4a-4f04b48af867",
+      "name": "Envia o Artigo no Telegram",
+      "webhookId": "7ba603d0-841d-4aa1-b1e1-029618d3f69a",
+      "credentials": {
+        "telegramApi": {
+          "id": "SUA_CREDENCIAL_AQUI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ca571383-d856-433a-94d4-0c4e50a359d9",
+              "leftValue": "={{ $json.ok }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        624,
+        -128
+      ],
+      "id": "3be81c11-1a72-423b-acce-39adf69436ba",
+      "name": "Foi Enviado com Sucesso"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "SEU_DOCUMENT_ID_AQUI",
+          "mode": "list",
+          "cachedResultName": "Artigos Autotic",
+          "cachedResultUrl": "SEU_DOCUMENT_ID_AQUI"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "SEU_DOCUMENT_ID_AQUI"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Limita em 1 Artigo').item.json.row_number }}",
+            "STATUS": "Enviado"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "TITULO",
+              "displayName": "TITULO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "DESCRIÇÃO",
+              "displayName": "DESCRIÇÃO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "STATUS",
+              "displayName": "STATUS",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        848,
+        -224
+      ],
+      "id": "cc693dab-45a5-4a3f-921c-161789787679",
+      "name": "Atualiza Planilha para Status Enviado",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SUA_CREDENCIAL_AQUI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "@seu_canal",
+        "text": "=O artigo *{{ $('Limita em 1 Artigo').item.json.TITULO }}* foi enviado com sucesso no Telegram!",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        848,
+        -32
+      ],
+      "id": "d8ab0bfd-8fbc-4d51-8628-5634cecf095b",
+      "name": "Notifica a Empresa Resppnsavel",
+      "webhookId": "a3c42e1e-964b-4cfc-9bda-e3fbc4512207",
+      "credentials": {
+        "telegramApi": {
+          "id": "SUA_CREDENCIAL_AQUI",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Seg à Sex as 9:00hrs": {
+      "main": [
+        [
+          {
+            "node": "Obtém artigos Não Enviados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtém artigos Não Enviados": {
+      "main": [
+        [
+          {
+            "node": "Limita em 1 Artigo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limita em 1 Artigo": {
+      "main": [
+        [
+          {
+            "node": "Envia o Artigo no Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envia o Artigo no Telegram": {
+      "main": [
+        [
+          {
+            "node": "Foi Enviado com Sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Foi Enviado com Sucesso": {
+      "main": [
+        [
+          {
+            "node": "Notifica a Empresa Resppnsavel",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Atualiza Planilha para Status Enviado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Obtém artigos Não Enviados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notifica a Empresa Resppnsavel": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "82d07dcb-58a6-4e98-ba12-998fa3ea03c0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7dcdad69fc7944d087b67f409d3828135ca7473c06203622a3961cdb771b2bcb"
+  },
+  "nodeGroups": [],
+  "id": "RbpkdqbJa95TODjG",
+  "tags": []
+}
